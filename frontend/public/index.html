@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rock Paper Scissors Online</title>
+  <meta name="description" content="Play Rock Paper Scissors online with friends using hand gesture recognition" />
+  <meta name="keywords" content="rock paper scissors, online game, hand tracking, gesture recognition, multiplayer" />
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#1e3a8a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="RPS Online" />
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Rock Paper Scissors Online" />
+  <meta property="og:description" content="Play Rock Paper Scissors online with friends using hand gesture recognition" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/og-image.png" />
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Rock Paper Scissors Online" />
+  <meta name="twitter:description" content="Play Rock Paper Scissors online with friends using hand gesture recognition" />
+  <meta name="twitter:image" content="/twitter-image.png" />
+  
+  <!-- Preload critical resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+  <!-- Security headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+  
+  <!-- CSS for loading screen -->
+  <style>
+    #initial-loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    
+    .loading-emojis {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Initial loading screen -->
+  <div id="initial-loading">
+    <div class="loading-emojis">🪨📄✂️</div>
+    <div class="loading-text">Rock Paper Scissors Online</div>
+    <div class="loading-spinner"></div>
+    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.8);">Loading game...</div>
+  </div>
+  
+  <!-- Main app container -->
+  <div id="app"></div>
+  
+  <!-- Error fallback -->
+  <noscript>
+    <div style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      padding: 20px;
+    ">
+      <div>
+        <h1>🪨📄✂️</h1>
+        <h2>JavaScript Required</h2>
+        <p>This application requires JavaScript to run. Please enable JavaScript in your browser and reload the page.</p>
+      </div>
+    </div>
+  </noscript>
+  
+  <!-- Browser compatibility check -->
+  <script>
+    // Check for modern browser features
+    function checkBrowserSupport() {
+      const requiredFeatures = [
+        'MediaDevices' in window && 'getUserMedia' in navigator.mediaDevices,
+        'WebSocket' in window,
+        'fetch' in window,
+        'Promise' in window
+      ];
+      
+      const isSupported = requiredFeatures.every(feature => feature);
+      
+      if (!isSupported) {
+        document.getElementById('initial-loading').innerHTML = `
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+            <h2>Browser Not Supported</h2>
+            <p>This application requires a modern browser with:</p>
+            <ul style="text-align: left; margin: 20px auto; max-width: 300px;">
+              <li>Camera access (getUserMedia)</li>
+              <li>WebSocket support</li>
+              <li>Modern JavaScript features</li>
+            </ul>
+            <p>Please update your browser or try a different one.</p>
+            <p><strong>Recommended browsers:</strong><br>
+            Chrome 60+, Firefox 55+, Safari 11+, Edge 79+</p>
+          </div>
+        `;
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // Hide loading screen when app is ready
+    window.addEventListener('load', () => {
+      if (checkBrowserSupport()) {
+        setTimeout(() => {
+          const loadingElement = document.getElementById('initial-loading');
+          if (loadingElement) {
+            loadingElement.style.opacity = '0';
+            loadingElement.style.transition = 'opacity 0.5s ease-out';
+            setTimeout(() => {
+              loadingElement.style.display = 'none';
+            }, 500);
+          }
+        }, 1000);
+      }
+    });
+    
+    // Handle errors
+    window.addEventListener('error', (e) => {
+      console.error('Application error:', e.error);
+    });
+    
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('Unhandled promise rejection:', e.reason);
+    });
+  </script>
+  
+  <!-- Main application script -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
